@@ -6,8 +6,10 @@ export default function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [currentNumber, setCurrentNumber] = useState('');
   const [lastNumber, setLastNumber] = useState('');
-  const [modalVisible, setModalVisible] = useState(false); // New state for modal visibility
-  
+  const [modalVisible, setModalVisible] = useState(false);
+  const [a, setA] = useState('');
+  const [b, setB] = useState('');
+  const [isSolvingEquation, setIsSolvingEquation] = useState(false);
 
   const buttons = [
     ['C', 'DEL', 'MODE', '/'],
@@ -16,16 +18,68 @@ export default function App() {
     [1, 2, 3, '+'],
     ['+/-', 0, '.', '=']
   ];
-
+  function solveLinearEquation() {
+    if (a === '' || b === '') {
+      setCurrentNumber('Enter both a and b');
+      return;
+    }
+  function solveLinearEquation() {
+    if (a === '' || b === '') {
+      setCurrentNumber('Enter both a and b');
+      return;
+    }
+    
+    const aValue = parseFloat(a);
+    const bValue = parseFloat(b);
+  
+    if (aValue === 0) {
+      setCurrentNumber('No solution');
+    } else {
+      const x = (-bValue / aValue).toString();
+      setCurrentNumber(`x = ${x}`);
+    }
+    
+    setModalVisible(false);
+    setA('');
+    setB('');
+  }
+  function factorial(n) {
+    if (n < 0) return 'Error'; // Giai thừa không xác định cho số âm
+    if (n === 0 || n === 1) return 1; // 0! và 1! bằng 1
+    let result = 1;
+    for (let i = 2; i <= n; i++) {
+      result *= i;
+    }
+    return result;
+  }
   function calculator() {
     if (currentNumber === '') {
       setCurrentNumber('0');
       return;
     }
-    
+    if (currentNumber.includes('!')) {
+      const numberBeforeFactorial = currentNumber.split('!')[0];
+      const factorialResult = factorial(parseInt(numberBeforeFactorial));
+      setCurrentNumber(factorialResult.toString());
+      return;
+    }
     if (['/', '*', '-', '+', '.'].includes(currentNumber[currentNumber.length - 1])) {
       setCurrentNumber(currentNumber + '0');
     }
+    if (currentNumber.includes('^')) {
+      const numbers = currentNumber.split('^'); // Tách chuỗi "x^y" thành mảng
+      const base = parseFloat(numbers[0]); // Cơ số x
+      const exponent = parseFloat(numbers[1]); // Số mũ y
+  
+      if (isNaN(base) || isNaN(exponent)) {
+        setCurrentNumber('Error');
+      } else {
+        const result = Math.pow(base, exponent).toString(); // Tính x^y
+        setCurrentNumber(result);
+      }
+      return;
+    }
+  
 
     let sanitizedExpression = currentNumber.replace(/--/g, '+');
 
@@ -56,8 +110,8 @@ export default function App() {
     }
 
     if (lastNumber && (!isNaN(buttonPressed) || buttonPressed === '.')) {
-      setCurrentNumber(buttonPressed);  // Start fresh with the new number
-      setLastNumber('');  // Clear the lastNumber
+      setCurrentNumber(buttonPressed);  
+      setLastNumber('');  
       return;
     }
 
@@ -127,6 +181,10 @@ export default function App() {
         setCurrentNumber(currentNumber + '^');
         setModalVisible(false);
         return;
+      case '!':
+        setCurrentNumber(currentNumber + '!');
+        setModalVisible(false);
+        return;
       default:
         result = number.toString();
     }
@@ -137,6 +195,14 @@ export default function App() {
   }
 
   const dynamicStyles = StyleSheet.create({
+    zeroButton: {
+      backgroundColor: darkMode ? '#303946' : '#fff',
+      flex: 1, 
+      height: 80,
+      margin: 5,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
     result: {
       backgroundColor: darkMode ? '#282f3b' : '#f5f5f5',
       width: '100%',
@@ -266,7 +332,7 @@ export default function App() {
         ))}
       </View>
 
-      {/* Modal for advanced functions */}
+     
       <Modal
         animationType="slide"
         transparent={true}
@@ -299,6 +365,9 @@ export default function App() {
               </TouchableOpacity>
               <TouchableOpacity style={dynamicStyles.modalButton} onPress={() => handleAdvancedFunction('x^y')}>
                 <Text style={dynamicStyles.modalButtonText}>xʸ (Power)</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={dynamicStyles.modalButton} onPress={() => handleAdvancedFunction('x^y')}>
+                <Text style={dynamicStyles.modalButtonText}>! (Power)</Text>
               </TouchableOpacity>
               <TouchableOpacity style={dynamicStyles.modalButton} onPress={() => handleAdvancedFunction('percent')}>
                 <Text style={dynamicStyles.modalButtonText}>% (Percentage)</Text>
@@ -333,4 +402,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: '100%',
   },
-});
+})}
